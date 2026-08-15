@@ -4,10 +4,40 @@ export interface Message extends Document{
     content: string;
     createdAt: Date;
 }
+export interface Post extends Document{
+    title: string;
+    description: string;
+    files: string[];
+    createdAt: Date;
+    price: number;
+}
 
 const messageSchema = new Schema<Message>({
     content:{
         type: String,
+        required: true
+    },
+    createdAt:{
+        type: Date, 
+        required:true,
+        default: Date.now
+    }
+})
+const postSchema = new Schema<Post>({
+    title:{
+        type: String,
+        required: true
+    },
+    description:{
+        type: String,
+        required: true
+    },
+    files:{
+        type: [String],
+        required: true
+    },
+    price:{
+        type: Number,
         required: true
     },
     createdAt:{
@@ -26,6 +56,7 @@ export interface User extends Document{
     isVerified: boolean;
     isAcceptingMessages: boolean;
     messages: Message[];
+    post: Post[];
 }
 
 const userSchema = new Schema<User>({
@@ -62,7 +93,8 @@ const userSchema = new Schema<User>({
         type: Boolean,
         required:[true, "message was not accepting"],
     },
-    messages: [messageSchema]
+    messages: [messageSchema] ,
+    post : [postSchema]
     
 })
                     // if you have pre defined model || if you create new model
