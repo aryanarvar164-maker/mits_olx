@@ -10,6 +10,7 @@ export interface Post extends Document{
     files: string[];
     createdAt: Date;
     price: number;
+    category: string;
 }
 
 const messageSchema = new Schema<Message>({
@@ -44,6 +45,10 @@ const postSchema = new Schema<Post>({
         type: Date, 
         required:true,
         default: Date.now
+    },
+    category:{
+        type: String,
+        required: true
     }
 })
 

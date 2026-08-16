@@ -41,6 +41,10 @@ const formSchema = z.object({
     price: z
         .number()
         .min(1, 'Price must be greater than 0'),
+
+    category: z
+        .string()
+        .min(1, 'Please select a category')
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -58,6 +62,7 @@ export default function UploadContent() {
             description: '',
             media: undefined,
             price: 0,
+            category: ''
         },
     });
 
@@ -141,6 +146,7 @@ export default function UploadContent() {
                         description: data.description,
                         price: data.price,
                         files: uploadedUrls,
+                        category: data.category,
                     }
                 );
 
@@ -159,7 +165,7 @@ export default function UploadContent() {
 
         } catch (error) {
             console.error(
-                'Upload error:',
+                'Upload error: in upload content page',
                 error
             );
 
@@ -218,6 +224,31 @@ export default function UploadContent() {
                                 <FormMessage />
                             </FormItem>
                         )}
+                    />  
+                    <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>
+                                    Product Category
+                                </FormLabel>
+
+                                <select
+                                    {...field}
+                                    className="border border-input bg-background px-3 py-2 text-sm"
+                                >
+                                    <option value="">Select a category</option>
+                                    <option value="Stationary">Stationary</option>
+                                    <option value="Vehicles">Vehicles</option>
+                                    <option value="Furniture">Furniture</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Other">Other</option>
+                                </select>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
 
                     {/* Description */}
@@ -233,7 +264,7 @@ export default function UploadContent() {
                                 <textarea
                                     {...field}
                                     placeholder="Describe your product..."
-                                    className="min-h-[150px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    className="min-h-37.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                                 />
 
                                 <FormMessage />
