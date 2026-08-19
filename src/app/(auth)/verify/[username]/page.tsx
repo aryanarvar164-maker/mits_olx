@@ -13,7 +13,7 @@ import {z} from "zod"
 
 
 
-const verifyAccount = () => {
+const VerifyAccount = () => {
     const router = useRouter()
     const params = useParams<{username: string}>()
 
@@ -31,14 +31,15 @@ const verifyAccount = () => {
             toast.success("Success", {
                 description: response.data.message,
             });
+            router.replace('/sign-in');
         } catch (error) {
             console.error('Error during sign-up:', error);
             
             const axiosError = error as AxiosError<ApiResponse>;
     
             // Default error message
-            const errorMessage = axiosError.response?.data.message;
-            ('There was a problem with your verify code. Please try again.');
+            const errorMessage = axiosError.response?.data.message ??
+              'There was a problem with your verify code. Please try again.';
     
             toast.error("Verify Code Failed", {
                 description: errorMessage,
@@ -75,4 +76,4 @@ const verifyAccount = () => {
   );
 }
 
-export default verifyAccount
+export default VerifyAccount

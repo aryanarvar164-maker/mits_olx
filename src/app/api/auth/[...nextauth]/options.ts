@@ -10,10 +10,13 @@ export const authOptions: NextAuthOptions = {
       id: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
+        identifier: { label: 'Email or username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials: any): Promise<any> {
+      async authorize(credentials) {
+        if (!credentials?.identifier || !credentials.password) {
+          throw new Error('Email/username and password are required');
+        }
         await dbConnect();
         try {
           const user = await UserModel.findOne({
@@ -33,12 +36,19 @@ export const authOptions: NextAuthOptions = {
             user.password
           );
           if (isPasswordCorrect) {
-            return user;
+            return {
+              id: user._id.toString(),
+              _id: user._id.toString(),
+              username: user.username,
+              email: user.email,
+              isVerified: user.isVerified,
+              isAcceptingMessages: user.isAcceptingMessages,
+            };
           } else {
             throw new Error('Incorrect password');
           }
-        } catch (err: any) {
-          throw new Error(err);
+        } catch (error: unknown) {
+          throw new Error(error instanceof Error ? error.message : 'Authentication failed');
         }
       },
     }),

@@ -1,9 +1,6 @@
 import mongoose,{Schema,Document} from "mongoose";
 
-export interface Message extends Document{
-    content: string;
-    createdAt: Date;
-}
+
 export interface Post extends Document{
     title: string;
     description: string;
@@ -13,17 +10,7 @@ export interface Post extends Document{
     category: string;
 }
 
-const messageSchema = new Schema<Message>({
-    content:{
-        type: String,
-        required: true
-    },
-    createdAt:{
-        type: Date, 
-        required:true,
-        default: Date.now
-    }
-})
+
 const postSchema = new Schema<Post>({
     title:{
         type: String,
@@ -59,8 +46,6 @@ export interface User extends Document{
     verifyCode: string;
     verifyCodeExpiry: Date;
     isVerified: boolean;
-    isAcceptingMessages: boolean;
-    messages: Message[];
     post: Post[];
 }
 
@@ -94,11 +79,6 @@ const userSchema = new Schema<User>({
         type: Boolean,
         required:[true, "user not verified"],
     },
-    isAcceptingMessages:{
-        type: Boolean,
-        required:[true, "message was not accepting"],
-    },
-    messages: [messageSchema] ,
     post : [postSchema]
     
 })
