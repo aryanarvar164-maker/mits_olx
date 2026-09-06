@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbconnection";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/options";
 import UserModel, { Post } from "@/model/User";
+import { checkContentModeration } from "@/lib/moderation"; // 👈 ADD THIS IMPORT
 
 export async function GET() {
     await dbConnect();
@@ -10,96 +11,26 @@ export async function GET() {
 
     if (!session?.user) {
         return Response.json(
-            {
-                success: false,
-                message: "Not Authenticated",
-            },
+            { success: false, message: "Not Authenticated" },
             { status: 401 }
         );
     }
 
     return Response.json(
-        {
-            success: true,
-            message: "authenticated",
-        },
+        { success: true, message: "authenticated" },
         { status: 200 }
     );
 }
 
-// export async function POST(request: Request) {
-//     await dbConnect();
-
-//     const session = await getServerSession(authOptions);
-
-//     if (!session?.user) {
-//         return Response.json(
-//             {
-//                 success: false,
-//                 message: "Not Authenticated",
-//             },
-//             { status: 401 }
-//         );
-//     }
-
-//     const user = await UserModel.findById(session.user._id);
-
-//     if (!user) {
-//         return Response.json(
-//             {
-//                 success: false,
-//                 message: "User not found",
-//             },
-//             { status: 404 }
-//         );
-//     }
-
-//     const { title, description, files, price, category } =
-//         await request.json();
-
-//         try {
-//             user.post.push({
-//                 title,
-//                 price,
-//                 description,
-//                 files,
-//                 category,
-//                 createdAt: new Date(),
-//             });
-//         } catch (error) {
-//             return Response.json(
-//                 {
-//                     success: false,
-//                     message: "Failed to upload post in api",
-//                 },
-//                 { status: 500 }
-//             );
-//         }
-
-//     await user.save();
-
-//     return Response.json(
-//         {
-//             success: true,
-//             message: "Post uploaded successfully",
-//         },
-//         { status: 201 }
-//     );
-// }
-
 export async function POST(request: Request) {
 try {
-await dbConnect();
-
+    await dbConnect();
 
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
         return Response.json(
-            {
-                success: false,
-                message: "Not Authenticated",
-            },
+            { success: false, message: "Not Authenticated" },
             { status: 401 }
         );
     }
@@ -113,22 +44,13 @@ await dbConnect();
 
     if (!user) {
         return Response.json(
-            {
-                success: false,
-                message: "User not found",
-            },
+            { success: false, message: "User not found" },
             { status: 404 }
         );
     }
 
     const body = await request.json();
-    const {
-        title,
-        description,
-        files,
-        price,
-        category,
-    } = body;
+    const { title, description, files, price, category } = body;
 
     console.log("REQUEST DATA RECEIVED:", {
         title: title?.toString(),
@@ -148,13 +70,47 @@ await dbConnect();
             category: Boolean(category),
         });
         return Response.json(
-            {
-                success: false,
-                message: "Missing required fields",
-            },
+            { success: false, message: "Missing required fields" },
             { status: 400 }
         );
     }
+
+    // 👇👇👇 MODERATION CHECK — PASTE STARTS HERE 👇👇👇
+
+    const filesArray = Array.isArray(files) ? files : [files];
+
+    console.log("RUNNING MODERATION CHECK...");
+
+    try {
+        const moderationCheck = await checkContentModeration(
+            String(description),
+            filesArray
+        );
+
+        if (!moderationCheck.isSafe) {
+            console.log("MODERATION FLAGGED:", moderationCheck.flaggedCategories);
+            return Response.json(
+                {
+                    success: false,
+                    message: `Content rejected: contains ${moderationCheck.flaggedCategories.join(", ")}`,
+                },
+                { status: 400 }
+            );
+        }
+
+        console.log("MODERATION PASSED");
+    } catch (modError) {
+        console.error("MODERATION CHECK FAILED:", modError);
+        return Response.json(
+            {
+                success: false,
+                message: "Could not verify content safety right now. Please try again in a minute.",
+            },
+            { status: 503 }
+        );
+    }
+
+    // 👆👆👆 MODERATION CHECK — PASTE ENDS HERE 👆👆👆
 
     const postData = {
         title: String(title).trim(),
@@ -167,21 +123,16 @@ await dbConnect();
 
     console.log("POST DATA TO SAVE:", JSON.stringify(postData));
 
-    // Use $push operator with MongoDB to ensure proper validation
     const result = await UserModel.updateOne(
         { _id: userId },
         { $push: { post: postData } }
     );
 
     console.log("UPDATE RESULT:", result);
-
     console.log("POST SAVED SUCCESSFULLY");
 
     return Response.json(
-        {
-            success: true,
-            message: "Post uploaded successfully",
-        },
+        { success: true, message: "Post uploaded successfully" },
         { status: 201 }
     );
 
@@ -191,12 +142,9 @@ await dbConnect();
     return Response.json(
         {
             success: false,
-            message: error instanceof Error
-                ? error.message
-                : "Unknown server error",
+            message: error instanceof Error ? error.message : "Unknown server error",
         },
         { status: 500 }
     );
 }
-
 }

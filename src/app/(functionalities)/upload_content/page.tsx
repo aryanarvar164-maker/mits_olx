@@ -164,17 +164,20 @@ export default function UploadContent() {
             }
 
         } catch (error) {
-            console.error(
-                'Upload error: in upload content page',
-                error
-            );
+    console.error('Upload error: in upload content page', error);
 
-            toast.error(
-                'Something went wrong while uploading.'
-            );
-        } finally {
-            setUploading(false);
-        }
+    if (axios.isAxiosError(error)) {
+        console.log('STATUS:', error.response?.status);
+        console.log('DATA:', error.response?.data);
+        toast.error(
+            error.response?.data?.message || 'Upload failed.'
+        );
+    } else {
+        toast.error('Something went wrong while uploading.');
+    }
+} finally {
+    setUploading(false);
+}
     };
 
     if (loading) {
