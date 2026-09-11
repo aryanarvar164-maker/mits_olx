@@ -29,7 +29,7 @@ const Navbar = () => {
         <a
         onClick={() => router.push("/dashboard")} 
         href="#" className="text-2xl font-extrabold tracking-tight uppercase mb-4 md:mb-0">
-          MITS <span className="text-[#DFA106]">OLX</span>
+          MITS <span className="text-[#DFA106]">OXP</span>
         </a>
 
         <div className="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
@@ -39,11 +39,12 @@ const Navbar = () => {
             onChange={handleCategoryChange}
             className="appearance-none cursor-pointer rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm outline-none transition hover:bg-white/15 focus:ring-2 focus:ring-[#DFA106] w-full md:w-auto"
           >
-              <option className="text-black" value="all">All</option>
-              <option className="text-black" value="technology">Technology</option>
-              <option className="text-black" value="Vehical">Vehical</option>
-              <option className="text-black" value="Stationary">stationary</option>
-              <option className="text-black" value="news">News</option>
+              <option className="text-black" value="All">All</option>
+              <option className="text-black" value="Electronics">Electronics</option>
+              <option className="text-black" value="Furniture">Furniture</option>
+              <option className="text-black" value="Vehicles">Vehicles</option>
+              <option className="text-black" value="Stationary">Stationary</option>
+              <option className="text-black" value="Other">Other</option>
           </select>
 
           {session ? (

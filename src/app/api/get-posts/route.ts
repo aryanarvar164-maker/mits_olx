@@ -139,11 +139,11 @@ export async function GET(request: Request) {
     try {
         const pipeline: PipelineStage[] = [
             // Find logged-in user
-            {
-                $match: {
-                    _id: userId,
-                },
-            },
+            // {
+            //     $match: {
+            //         _id: userId,
+            //     },
+            // },
 
             // Convert post array into individual posts
             {
@@ -152,7 +152,7 @@ export async function GET(request: Request) {
         ];
 
         // Filter category if not "all"
-        if (category && category !== "all") {
+        if (category && category !== "All") {
             pipeline.push({
                 $match: {
                     "post.category": category,

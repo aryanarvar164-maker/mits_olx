@@ -8,24 +8,10 @@ import {
   Tag,
   IndianRupee,
   CalendarDays,
-  X,
 } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 import axios, { AxiosError } from 'axios';
 import { toast } from 'sonner';
@@ -45,33 +31,30 @@ type PostCardProps = {
   post: Post;
   username: string;
   email: string;
-//   onPostDelete: (postId: string) => void;
+  onPostDelete: (postId: string) => void; // 👈 was commented out, now active
 };
 
 export function PostCard({
   post,
   username,
   email,
-//   onPostDelete,
+  onPostDelete, // 👈 was missing from destructure, caused ReferenceError
 }: PostCardProps) {
-//   const handleDeleteConfirm = async () => {
-//     try {
-//       const response = await axios.delete<ApiResponse>(
-//         `/api/delete-post/${post._id}`
-//       );
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await axios.delete<ApiResponse>(
+        `/api/delete-post/${post._id}`
+      );
 
-//       toast.success(response.data.message);
-
-//       onPostDelete(post._id);
-//     } catch (error) {
-//       const axiosError = error as AxiosError<ApiResponse>;
-
-//       toast.error(
-//         axiosError.response?.data.message ??
-//           'Failed to delete post'
-//       );
-//     }
-//   };
+      toast.success(response.data.message);
+      onPostDelete(post._id); // removes card from UI on success
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      toast.error(
+        axiosError.response?.data.message ?? 'Failed to delete post'
+      );
+    }
+  };
 
   return (
     <Card
@@ -89,19 +72,12 @@ export function PostCard({
       "
     >
       {/* ================= IMAGE ================= */}
-      <div className="relative h-56 w-full overflow-hidden bg-[#EEF1E7]">
+      <div className="relative w-full overflow-hidden bg-[#EEF1E7]">
         {post.files?.length > 0 ? (
           <img
             src={post.files[0]}
             alt={post.title}
-            className="
-              h-full
-              w-full
-              object-cover
-              transition-transform
-              duration-500
-              group-hover:scale-105
-            "
+            className="h-auto max-h-[420px] w-full object-contain"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-[#8A8368]">
@@ -109,7 +85,6 @@ export function PostCard({
           </div>
         )}
 
-        {/* Image gradient */}
         <div
           className="
             absolute
@@ -121,7 +96,6 @@ export function PostCard({
           "
         />
 
-        {/* Category */}
         <div className="absolute left-4 top-4">
           <Badge
             className="
@@ -138,64 +112,13 @@ export function PostCard({
             "
           >
             <Tag className="mr-1.5 h-3.5 w-3.5" />
-
             {post.category}
           </Badge>
         </div>
-
-        {/* Delete */}
-        {/* <div className="absolute right-4 top-4">
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                size="icon"
-                className="
-                  h-9
-                  w-9
-                  rounded-full
-                  bg-red-500/90
-                  backdrop-blur-sm
-                  hover:bg-red-600
-                "
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Delete this post?
-                </AlertDialogTitle>
-
-                <AlertDialogDescription>
-                  This action cannot be undone. This post will be
-                  permanently deleted.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel>
-                  Cancel
-                </AlertDialogCancel>
-
-                <AlertDialogAction
-                  onClick={handleDeleteConfirm}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div> */}
       </div>
 
       {/* ================= CONTENT ================= */}
       <CardContent className="p-5 sm:p-6">
-
-        {/* Title */}
         <h2
           className="
             mb-4
@@ -211,7 +134,6 @@ export function PostCard({
 
         {/* ================= USER ================= */}
         <div className="mb-5 flex items-center gap-3">
-
           <div
             className="
               flex
@@ -232,22 +154,15 @@ export function PostCard({
             <p className="truncate font-semibold text-[#14213D]">
               {username}
             </p>
-
             <div className="flex items-center gap-1.5 text-sm text-[#6B7280]">
               <Mail className="h-3.5 w-3.5 shrink-0" />
-
-              <span className="truncate">
-                {email}
-              </span>
+              <span className="truncate">{email}</span>
             </div>
           </div>
-
         </div>
 
         {/* ================= PRICE + CATEGORY ================= */}
         <div className="grid grid-cols-2 gap-3">
-
-          {/* Price */}
           <div
             className="
               rounded-xl
@@ -259,16 +174,13 @@ export function PostCard({
           >
             <div className="mb-1 flex items-center gap-1.5 text-xs text-[#8A8368]">
               <IndianRupee className="h-3.5 w-3.5" />
-
               Expected Price
             </div>
-
             <p className="font-semibold text-[#1B8A5A]">
               ₹{post.price.toLocaleString('en-IN')}
             </p>
           </div>
 
-          {/* Category */}
           <div
             className="
               rounded-xl
@@ -280,64 +192,66 @@ export function PostCard({
           >
             <div className="mb-1 flex items-center gap-1.5 text-xs text-[#8A8368]">
               <Tag className="h-3.5 w-3.5" />
-
               Category
             </div>
-
             <p className="truncate font-medium text-[#14213D]">
               {post.category}
             </p>
           </div>
-
         </div>
 
-        {/* ================= DATE ================= */}
-        <div
-          className="
-            mt-3
-            flex
-            items-center
-            gap-2
-            rounded-xl
-            border
-            border-[#E4DFCB]
-            bg-[#F5F2E6]
-            px-3
-            py-3
-            text-sm
-          "
-        >
-          <CalendarDays className="h-4 w-4 text-[#8A8368]" />
+        {/* ================= DATE + REMOVE ================= */}
+        <div className="grid grid-cols-2 gap-3 mt-3">
+          <div
+            className="
+              flex
+              flex-col
+              justify-center
+              rounded-xl
+              border
+              border-[#E4DFCB]
+              bg-[#F5F2E6]
+              p-3
+              text-sm
+            "
+          >
+            <div className="flex items-center gap-1.5 text-xs text-[#8A8368]">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Uploaded
+            </div>
+            <span className="font-medium text-[#14213D]">
+              {dayjs(post.createdAt).format('MMM D, YYYY')}
+            </span>
+          </div>
 
-          <span className="text-[#8A8368]">
-            Uploaded
-          </span>
-
-          <span className="font-medium text-[#14213D]">
-            {dayjs(post.createdAt).format('MMM D, YYYY')}
-          </span>
+          <button
+            onClick={handleDeleteConfirm}
+            className="
+              rounded-xl
+              border
+              border-[#E4DFCB]
+              bg-[#cc3e0a]
+              p-3
+              font-medium
+              text-white
+              hover:bg-[#a8330a]
+              transition-colors
+            "
+          >
+            Remove
+          </button>
         </div>
 
         {/* ================= DESCRIPTION ================= */}
         <div className="mt-5">
+  <h3 className="mb-2 text-sm font-semibold text-[#4B5566]">
+    Description
+  </h3>
 
-          <h3 className="mb-2 text-sm font-semibold text-[#4B5566]">
-            Description
-          </h3>
-
-          <p
-            className="
-              line-clamp-3
-              text-sm
-              leading-6
-              text-[#5B6472]
-            "
-          >
-            {post.description}
-          </p>
-
-        </div>
-
+  <p className="text-sm leading-6 text-[#5B6472]">
+    {post.description}
+  </p>
+</div>
       </CardContent>
     </Card>
   );
