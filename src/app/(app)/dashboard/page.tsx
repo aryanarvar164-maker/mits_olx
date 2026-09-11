@@ -84,7 +84,6 @@ export default function Dashboard() {
         </div>
     ))}
 
-
             {/* Detailed post */}
             {selectedPost && (
                 <div className="fixed inset-0 z-50 bg-[#14213D]/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -101,13 +100,14 @@ export default function Dashboard() {
 
                         {/* Image */}
                         <PostCard 
-                            post={selectedPost}
+                            post={{ ...selectedPost, _id: String(selectedPost._id) }}
                             username={selectedPost.username}
                             email={selectedPost.email}
                         />
                     </div>
                 </div>
             )}
+
         </div>
         </div>
     );
