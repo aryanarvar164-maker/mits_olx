@@ -8,6 +8,8 @@ export interface Post extends Document{
     createdAt: Date;
     price: number;
     category: string;
+    username: string;
+    email: string;
 }
 
 

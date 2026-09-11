@@ -13,6 +13,13 @@ export default function Dashboard() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
+    const handlePostDelete = (postId: string) => {
+        setPosts((currentPosts) =>
+            currentPosts.filter((post) => String(post._id) !== postId)
+        );
+        setSelectedPost(null);
+    };
+
     useEffect(() => {
         const getPosts = async () => {
             const response = await fetch(
@@ -103,6 +110,7 @@ export default function Dashboard() {
                             post={{ ...selectedPost, _id: String(selectedPost._id) }}
                             username={selectedPost.username}
                             email={selectedPost.email}
+                            onPostDelete={handlePostDelete}
                         />
                     </div>
                 </div>

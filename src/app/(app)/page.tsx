@@ -12,6 +12,12 @@ export default function Dashboard() {
 
     const [posts, setPosts] = useState<Post[]>([]);
 
+    const handlePostDelete = (postId: string) => {
+        setPosts((currentPosts) =>
+            currentPosts.filter((post) => String(post._id) !== postId)
+        );
+    };
+
     useEffect(() => {
         const getPosts = async () => {
             const response = await fetch(
@@ -34,7 +40,12 @@ export default function Dashboard() {
 
             {posts.map((post) => (
                 <div key={String(post._id)}>
-                    <PostCard post={post} username={post.username} email={post.email} />
+                    <PostCard
+                        post={{ ...post, _id: String(post._id) }}
+                        username={post.username}
+                        email={post.email}
+                        onPostDelete={handlePostDelete}
+                    />
                 </div>
             ))}
         </div>
